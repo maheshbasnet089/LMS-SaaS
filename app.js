@@ -7,9 +7,11 @@ require("./model/index")
 app.use(express.json())
 //routes
 const userRoute = require('./routes/user/userRoute')
+const instituteRoute = require('./routes/institute/instituteRoute')
 
 
-app.use("/api/",userRoute)
+app.use("/api/user",userRoute)
+app.use("/api/insitute",instituteRoute)
 
 const PORT = process.env.PORT || 4000
 app.listen(PORT,()=>{
