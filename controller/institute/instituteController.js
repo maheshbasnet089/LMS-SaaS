@@ -7,6 +7,7 @@ const {sequelize} = db
 exports.createInsitute = async(req,res,next)=>{
     const {userId} = req
     const {name,email,address,phoneNumber} = req.body 
+    console.log(req.body)
     const vatNo = req.body.vatNo || null 
     const panNo = req.body.panNo | null
     if(!name || !email || !address || !phoneNumber){
@@ -80,10 +81,11 @@ exports.createTeacherTable = async (req,res,next)=>{
     await sequelize.query(`CREATE TABLE IF NOT EXISTS teachers_${instituteNumber}(
         id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
         phoneNumber VARCHAR(255) NOT NULL,
         address VARCHAR(255) NOT NULL,
-        status VARCHAR(255) NOT NULL
+        status VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL
     )`,{
         type : QueryTypes.CREATE
     })
