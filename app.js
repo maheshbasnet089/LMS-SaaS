@@ -15,7 +15,7 @@ app.use("/api/user",userRoute)
 app.use('/api/institute/teacher',teacherRoute)
 app.use("/api/institute",instituteRoute)
 
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 8000
 app.listen(PORT,()=>{
     console.log(`[server] has started at port ${3000}`)
 })

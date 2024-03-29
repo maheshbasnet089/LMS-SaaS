@@ -6,7 +6,7 @@ const {sequelize} = db
 
 exports.createInsitute = async(req,res,next)=>{
     const {userId} = req
-    const {name,email,address,phoneNumber} = req.body 
+    const {name,email,address,phoneNumber,latitude,longitude} = req.body 
     console.log(req.body)
     const vatNo = req.body.vatNo || null 
     const panNo = req.body.panNo | null
@@ -21,18 +21,22 @@ exports.createInsitute = async(req,res,next)=>{
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL, 
         address VARCHAR(255) NOT NULL,
+        latitude VARCHAR(255),
+        longitude VARCHAR(255),
         phoneNumber VARCHAR(255) NOT NULL,
         vatNo INT,
         panNO INT,
-        userId INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+        userId INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
     )`,{
         type : QueryTypes.CREATE
     })
 
-    await sequelize.query(`INSERT INTO institute_${instituteNumber}(name,email,address,phoneNumber,vatNo,panNo,userId) VALUES(?,?,?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO institute_${instituteNumber}(name,email,address,phoneNumber,vatNo,panNo,userId,latitude,longitude) VALUES(?,?,?,?,?,?,?,?,?)`,{
         type : QueryTypes.INSERT,
-        replacements : [name,email,address,phoneNumber,vatNo,panNo,userId]
+        replacements : [name,email,address,phoneNumber,vatNo,panNo,userId,latitude,longitude]
     })
 
     req.instituteNumber = instituteNumber
@@ -69,7 +73,11 @@ exports.createStudentTable = async(req,res,next)=>{
         email VARCHAR(255) NOT NULL,
         phoneNumber VARCHAR(255) NOT NULL,
         address VARCHAR(255) NOT NULL,
-        status VARCHAR(255) NOT NULL
+        status VARCHAR(255) NOT NULL,
+        photo VARCHAR(255) NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
     )`,{
         type : QueryTypes.CREATE
     })
@@ -85,7 +93,10 @@ exports.createTeacherTable = async (req,res,next)=>{
         phoneNumber VARCHAR(255) NOT NULL,
         address VARCHAR(255) NOT NULL,
         status VARCHAR(255) NOT NULL,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        photo VARCHAR(255) NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`,{
         type : QueryTypes.CREATE
     })

@@ -3,7 +3,11 @@ const { isAuthenticated } = require("../../../middleware/isAuthenticated")
 
 const router = require("express").Router()
 
-router.route('/').post(isAuthenticated,createTeacher).get(isAuthenticated,getTeachers)
+const {multer,storage} = require("../../../services/multerConfig")
+const upload = multer({storage:storage})
+
+
+router.route('/').post(isAuthenticated,upload.single('image'),createTeacher).get(isAuthenticated,getTeachers)
 router.route("/:teacherId").delete(isAuthenticated,deleteTeacher)
 
 
