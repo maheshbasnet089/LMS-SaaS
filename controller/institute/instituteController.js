@@ -28,7 +28,7 @@ exports.createInsitute = async(req,res,next)=>{
         panNO INT,
         userId INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
     )`,{
         type : QueryTypes.CREATE
@@ -36,7 +36,7 @@ exports.createInsitute = async(req,res,next)=>{
 
     await sequelize.query(`INSERT INTO institute_${instituteNumber}(name,email,address,phoneNumber,vatNo,panNo,userId,latitude,longitude) VALUES(?,?,?,?,?,?,?,?,?)`,{
         type : QueryTypes.INSERT,
-        replacements : [name,email,address,phoneNumber,vatNo,panNo,userId,latitude,longitude]
+        replacements : [name,email,address,phoneNumber,vatNo,panNo,userId,latitude || null,longitude|| null]
     })
 
     req.instituteNumber = instituteNumber
@@ -76,7 +76,7 @@ exports.createStudentTable = async(req,res,next)=>{
         status VARCHAR(255) NOT NULL,
         photo VARCHAR(255) NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
     )`,{
         type : QueryTypes.CREATE
@@ -96,7 +96,7 @@ exports.createTeacherTable = async (req,res,next)=>{
         password VARCHAR(255) NOT NULL,
         photo VARCHAR(255) NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURERNT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )`,{
         type : QueryTypes.CREATE
     })
@@ -113,4 +113,96 @@ exports.setCurrentOrganizationNumber = async(req,res)=>{
         message : "Institute created successfully",
         instituteNumber
     })
+}
+
+
+exports.createCategoryTable = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseCategory_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255)
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    await sequelize.query(`INSERT INTO courseCategory_${instituteNumber}(name) VALUES('Frontend'),('Backend'),('App'),('Web') `,{
+        type : QueryTypes.INSERT
+    })
+    next()
+}
+
+
+exports.createSyllabusTable = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseSyllabus_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        videoId INT REFERENCES courseSyllabusVideo_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        reviewId INT REFERENCES courseSyllabusReview_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        qnaId INT REFERENCES courseSyllabusQna_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
+}
+
+
+exports.createSyllabusVideoTable  = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseSyllabusVideo_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        videoUrl VARCHAR(255) NOT NULL,
+        videoTitle VARCHAR(255) NOT NULL
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
+}
+
+exports.createSyllabusReviewTable = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseSyllabusReview_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        message TEXT, 
+        rating INT NOT NULL
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
+}
+
+exports.createSyllabusQnaSession = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseSyllabusQna_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+        question VARCHAR(255) NOT NULL, 
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
+}
+
+exports.courseSyllabusQuestionsAnswerTable = async(req,res,next)=>{
+    const {instituteNumber} = req 
+    await sequelize.query(`CREATE TABLE courseSyllabusQuestionsAnswer_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+        answer VARCHAR(255) NOT NULL, 
+        questionId INT REFERENCES courseSyllabusQna_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        teacherId INT REFERENCES teachers_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE
+
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
 }
