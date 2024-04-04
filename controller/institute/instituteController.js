@@ -140,8 +140,9 @@ exports.createSyllabusTable = async(req,res,next)=>{
         videoId INT REFERENCES courseSyllabusVideo_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
         reviewId INT REFERENCES courseSyllabusReview_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
         qnaId INT REFERENCES courseSyllabusQna_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
-
+        courseId INT REFERENCES course_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        teacherId INT REFERENCES teachers_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
     )`,{
@@ -201,6 +202,26 @@ exports.courseSyllabusQuestionsAnswerTable = async(req,res,next)=>{
         studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
         teacherId INT REFERENCES teachers_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE
 
+    )`,{
+        type : QueryTypes.CREATE
+    })
+    next()
+}
+
+
+exports.createCourseTable = async(req,res,next)=>{
+    const {instituteNumber} = req 
+
+    await sequelize.query(`CREATE TABLE course_${instituteNumber}(
+        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY , 
+        name VARCHAR(255) NOT NULL, 
+        description TEXT NOT NULL,
+        price INT NOT NULL,
+        teacherId INT REFERENCES teachers_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        startingDate VARCHAR(255),
+        endingDate VARCHAR(255),
+        time VARCHAR(255),
+        image VARCHAR(255)
     )`,{
         type : QueryTypes.CREATE
     })
