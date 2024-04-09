@@ -5,6 +5,7 @@ const sendEmail = require("../../../services/sendEmail")
 exports.createCourse = async(req,res)=>{
     const {instituteNumber} = req 
     const {name,price,startingDate,endingDate,description,teacherId,time} = req.body 
+    console.log(req.body)
     if(!name || !price || !startingDate || !endingDate || !description || !teacherId || !time){
         return res.status(400).json({
             message : "Please provide name,price,startingDate,endingDate,description,teacherId,time"
@@ -24,11 +25,12 @@ exports.createCourse = async(req,res)=>{
 
    if(!data) return res.status(400).json({message:"No teacher with that id"})
 
-    await sequelize.query(`INSERT INTO course_${instituteNumber}(name,price,startingDate,endingDate,description,teacherId,time,image) VALUES(?,?,?,?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO course_${instituteNumber}(name,price,startingDate,endingDate,description,teacherId,time,image) VALUES('${name}',${price},'${startingDate}','${endingDate}','${description}',${teacherId},'${time}','${imageUrl}')`,{
         type : QueryTypes.INSERT,
-        replacement : [
-            name,price,startingDate,endingDate,description,teacherId,time,imageUrl
-        ]
+        // replacement : [
+            
+        //     name,parseInt(price),startingDate,endingDate,description,parseInt(teacherId),time,imageUrl
+        // ]
     })
 
     // send mail to notify teacher about course addition
@@ -75,7 +77,7 @@ exports.deleteCourse = async(req,res)=>{
 
 exports.getAllCourses = async(req,res)=>{
     const {instituteNumber} =req 
-    const data = await sequelize.query(`SELECT *,teachers_${instituteNumber}.name FROM courses_${instituteNumber} JOIN teachers_${instituteNumber} ON courses_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
+    const data = await sequelize.query(`SELECT *,teachers_${instituteNumber}.name FROM course_${instituteNumber} JOIN teachers_${instituteNumber} ON course_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
         type : QueryTypes.SELECT
     })
     res.status(200).json({
@@ -89,11 +91,11 @@ exports.getSingleCourse = async(req,res)=>{
     const {instituteNumber} = req 
     const {id} = req.params
     let data
-    data = await sequelize.query(`SELECT * FROM courseSyllabus_${instituteNumber} cs JOIN course_${instituteNumber} c ON cs.course = c.id JOIN courseSyllabusReview_${instituteNumber} cr ON cs.reviewId = cr.id JOIN courseSyllabusQna_${instituteNumber} qi ON cs.qnaId = qi.id JOIN videoId_${instituteNumber} vi ON cs.videoId = vi.id JOIN teachers_${instituteNumber} ON coursesSyllabus_${instituteNumber}.teacherId = teachers_${instituteNumber}.id WHERE cs.courseId = ${id}`,{
+    data = await sequelize.query(`SELECT * FROM courseSyllabus_${instituteNumber} cs JOIN course_${instituteNumber} c ON cs.courseId = c.id JOIN courseSyllabusReview_${instituteNumber} cr ON cs.reviewId = cr.id JOIN courseSyllabusQna_${instituteNumber} qi ON cs.qnaId = qi.id JOIN courseSyllabusVideo_${instituteNumber} vi ON cs.videoId = vi.id JOIN teachers_${instituteNumber} ON cs.teacherId = teachers_${instituteNumber}.id WHERE cs.courseId = ${id}`,{
         type : QueryTypes.SELECT
     }) 
     if(data.length === 0){
-       data =  await sequelize.query(`SELECT *,teachers_${instituteNumber}.name FROM courses_${instituteNumber} JOIN teachers_${instituteNumber} ON courses_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
+       data =  await sequelize.query(`SELECT *,teachers_${instituteNumber}.name FROM course_${instituteNumber} JOIN teachers_${instituteNumber} ON course_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
         type : QueryTypes.SELECT
     })
     }

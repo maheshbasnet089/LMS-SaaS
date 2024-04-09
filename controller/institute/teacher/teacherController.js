@@ -28,7 +28,7 @@ exports.createTeacher = async(req,res)=>{
         })
     }
     const randomPassword = "PASS_" + Math.floor(100000 + Math.random() * 900000)
-    await sequelize.query(`INSERT INTO teachers_${instituteNumber}(name,email,phoneNumber,address,status,password,photo) VALUES(?,?,?,?,?,?)`,{
+    await sequelize.query(`INSERT INTO teachers_${instituteNumber}(name,email,phoneNumber,address,status,password,photo) VALUES(?,?,?,?,?,?,?)`,{
         type : QueryTypes.INSERT,
         replacements : [
             name,
