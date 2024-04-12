@@ -138,8 +138,6 @@ exports.createSyllabusTable = async(req,res,next)=>{
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         videoId INT REFERENCES courseSyllabusVideo_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
-        reviewId INT REFERENCES courseSyllabusReview_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
-        qnaId INT REFERENCES courseSyllabusQna_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
         courseId INT REFERENCES course_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         teacherId INT REFERENCES teachers_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -169,13 +167,14 @@ exports.createSyllabusReviewTable = async(req,res,next)=>{
     await sequelize.query(`CREATE TABLE courseSyllabusReview_${instituteNumber}(
         id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         message TEXT, 
-        rating INT NOT NULL
+        rating INT NOT NULL,
+        syllabusId INT REFERENCES courseSyllabus_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`,{
         type : QueryTypes.CREATE
     })
     next()
 }
-
+``
 exports.createSyllabusQnaSession = async(req,res,next)=>{
     const {instituteNumber} = req 
     await sequelize.query(`CREATE TABLE courseSyllabusQna_${instituteNumber}(
@@ -183,8 +182,8 @@ exports.createSyllabusQnaSession = async(req,res,next)=>{
         question VARCHAR(255) NOT NULL, 
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE
-
+        studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        syllabusId INT REFERENCES courseSyllabus_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`,{
         type : QueryTypes.CREATE
     })
@@ -200,7 +199,8 @@ exports.courseSyllabusQuestionsAnswerTable = async(req,res,next)=>{
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         studentId INT REFERENCES students_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        teacherId INT REFERENCES teachers_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE
+        teacherId INT REFERENCES teachers_${instituteNumber}(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        syllabusId INT REFERENCES courseSyllabus_${instituteNumber}(id) ON DELETE CASCADE ON UPDATE CASCADE
 
     )`,{
         type : QueryTypes.CREATE

@@ -77,7 +77,7 @@ exports.deleteCourse = async(req,res)=>{
 
 exports.getAllCourses = async(req,res)=>{
     const {instituteNumber} =req 
-    const data = await sequelize.query(`SELECT *,teachers_${instituteNumber}.name FROM course_${instituteNumber} JOIN teachers_${instituteNumber} ON course_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
+    const data = await sequelize.query(`SELECT *,teachers_${instituteNumber}.name,course_${instituteNumber}.name AS courseName,course_${instituteNumber}.id AS courseId FROM course_${instituteNumber} JOIN teachers_${instituteNumber} ON course_${instituteNumber}.teacherId = teachers_${instituteNumber}.id `,{
         type : QueryTypes.SELECT
     })
     res.status(200).json({

@@ -35,7 +35,7 @@ exports.teacherLogin = async(req,res)=>{
    const token =  jwt.sign({
         id : teacherData.id, 
         instituteNumber : instituteNumber
-    },process.env.JWT_SECRET,{
+    },process.env.JWT_SECRET_TEACHER,{
         expiresIn : "20d"
     })
     res.status(200).json({
