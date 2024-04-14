@@ -13,7 +13,7 @@ exports.isAuthenticatedTeacher =  async(req,res,next)=>{
     }
 
     const result =  await promisify(jwt.verify)(token,process.env.JWT_SECRET_TEACHER)
-    console.log(result)
+
     const [userData] = await sequelize.query(`SELECT * FROM teachers_${result.instituteNumber} WHERE id=?`,{
         replacements : [result.id],
         type : QueryTypes.SELECT

@@ -75,6 +75,7 @@ exports.createStudentTable = async(req,res,next)=>{
         address VARCHAR(255) NOT NULL,
         status VARCHAR(255) NOT NULL,
         photo VARCHAR(255) NULL,
+        password VARCHAR(255) NOT NULL,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
