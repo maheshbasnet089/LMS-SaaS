@@ -2,7 +2,7 @@ const { QueryTypes } = require("sequelize")
 const { sequelize } = require("../../model/")
 
 exports.askQuestion = async(req,res)=>{
-    const {question,syllabusId} = req 
+    const {question,syllabusId} = req.body 
     const {studentId,instituteNumber} = req 
     if(!question || !syllabusId){
         return res.status(400).json({
@@ -18,8 +18,46 @@ exports.askQuestion = async(req,res)=>{
     })
 }
 
+
+exports.getQuestions = async(req,res)=>{
+    const {syllabusId} = req.params
+    const {instituteNumber} = req 
+    if(!syllabusId){
+        return res.status(400).json({
+            message : 'Please provide syllabusId'
+        })
+    }
+    const data = await sequelize.query(`SELECT * FROM courseSyllabusQna_${instituteNumber} JOIN students_${instituteNumber} ON courseSyllabusQna_${instituteNumber}.studentId = students_${instituteNumber}.id WHERE courseSyllabusQna_${instituteNumber}.syllabusId=?`,{
+        type : QueryTypes.SELECT,
+        replacements : [syllabusId]
+    })
+    res.status(200).json({
+        message : "Questions fetched successfully",
+        data
+    })
+}
+
+exports.getAnswers = async(req,res)=>{
+    const {questionId} = req.params 
+    const {instituteNumber} = req 
+    if(!questionId){
+        return res.status(400).json({
+            message : 'Please provide questionId'
+        })
+    }
+    const data = await sequelize.query(`SELECT * FROM courseSyllabusQuestionsAnswer_${instituteNumber} JOIN courseSyllabusQna_${instituteNumber} ON courseSyllabusQuestionsAnswer_${instituteNumber}.questionId = courseSyllabusQna_${instituteNumber}.id LEFT JOIN students_${instituteNumber} ON courseSyllabusQuestionsAnswer_${instituteNumber}.studentId = students_${instituteNumber}.id LEFT JOIN teachers_${instituteNumber} ON courseSyllabusQuestionsAnswer_${instituteNumber}.studentId = teachers_${instituteNumber}.id WHERE courseSyllabusQuestionsAnswer_${instituteNumber}.questionId=?`,{
+        type : QueryTypes.SELECT,
+        replacements : [questionId]
+    })
+    res.status(200).json({
+        message : "Questions fetched successfully",
+        data
+    })
+}
+
 exports.answerQuestion = async(req,res)=>{
-    const {answer,questionId,syllabusId} = req.body 
+    const {questionId} = req.params
+    const {answer,syllabusId} = req.body 
     const {studentId,instituteNumber} = req 
 
     if(!answer || !questionId || !syllabusId){
@@ -56,5 +94,42 @@ exports.deleteMyQuestion = async(req,res)=>{
 }
 
 exports.deleteMyAnswer = async(req,res)=>{
-    
+    const {answerId} = req.params 
+    const {studentId,instituteNumber} = req
+
+    if(!answerId){
+        return res.status(400).json({
+            message : "Please provide answerId"
+        })
+    }
+   const data =  await sequelize.query(`SELECT * FROM courseSyllabusQuestionsAnswer_${instituteNumber} WHERE answerId=? AND studentId=?`,{
+        type : QueryTypes.SELECT, 
+        replacements : [answerId,studentId]
+    })
+    if(data.length === 0 ){
+        return res.status(404).json({
+            message : "You don't have that answerId answer"
+        })
+    }
+    await sequelize.query(`DELETE FROM courseSyllabusQuestionsAnswer_${instituteNumber} WHERE answerId=? `,{
+        type : QueryTypes.DELETE,
+        replacements : [answerId]
+    })
+    res.status(200).json({
+        message : "Answer deleted successfully"
+    })
+}
+exports.updateAnswer = async (req,res)=>{
+    const {answer,questionId} = req.body 
+    const {answerId} = req.params 
+    const {instituteNumber} = req
+
+    await sequelize.query(`UPDATE courseSyllabusQuestionsAnswer_${instituteNumber} SET answer=? WHERE answerId=? AND questionId=?`,{
+        type : QueryTypes.UPDATE,
+        replacements : [answer,answerId,questionId]
+    })
+    res.status(200).json({
+        message : "answer updated successfully"
+    })
+
 }

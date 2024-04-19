@@ -15,6 +15,7 @@ const courseRoute = require("./routes/institute/course/courseRoute")
 const teacherSyllabusRoute = require("./routes/teacher/syllabuRoute")
 const teacherAuthRoute = require("./routes/teacher/authRoute")
 const studentAuthRoute = require("./routes/student/authRoute")
+const qnaRoute = require("./routes/student/qnaRoute")
 
 
 app.use("/api/user",userRoute)
@@ -27,6 +28,7 @@ app.use("/api/institute/course",courseRoute)
 
 // students route
 app.use("/api/institute/student/auth",studentAuthRoute)
+app.use("/api/institute/student/qna",qnaRoute)
 app.use('/api/institute/student',studentRoute)
 
 
