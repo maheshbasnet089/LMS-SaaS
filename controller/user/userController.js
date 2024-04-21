@@ -9,13 +9,14 @@ exports.registerUser = async(req,res)=>{
             message : "Please provide email,username,password"
         })
     }
-   await users.create({
+   const data = await users.create({
         email,
         username,
         password : bcrypt.hashSync(password,10)
     })
     res.status(200).json({
-        message : "user registered successfully"
+        message : "user registered successfully",
+        data
     })
 }
 

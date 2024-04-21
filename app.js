@@ -3,6 +3,12 @@ const app = express()
 require("dotenv").config()
 
 require("./model/index")
+const cors = require('cors')
+
+app.use(cors({
+    origin : "*"
+}
+))
 
 app.use(express.json())
 //routes
