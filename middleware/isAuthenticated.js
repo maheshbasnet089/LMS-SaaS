@@ -3,6 +3,7 @@ const {promisify} = require("util")
 const { users } = require('../model')
 
 exports.isAuthenticated =  async(req,res,next)=>{
+    
     const token = req.headers.authorization 
     console.log(token)
     if(!token || token === "" || token === undefined || token === null){

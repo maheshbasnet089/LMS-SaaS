@@ -228,3 +228,107 @@ exports.createCourseTable = async(req,res,next)=>{
     })
     next()
 }
+
+exports.getMyInstitutes = async(req,res)=>{
+    const userId = req.userId 
+    const institutes = await sequelize.query(`SELECT instituteNumber FROM userInstitutes_${userId}`,{
+        type : QueryTypes.SELECT
+    })
+    const allInstitutes = institutes.map(async (institute)=>{
+        
+           const [data] =  await sequelize.query(`SELECT * FROM insititute_${institute}`,{
+                type : QueryTypes.SELECT
+            })
+            return data 
+            
+    })
+
+    res.status(200).json({
+        message : "All institutes fetched successfully",
+        data : allInstitutes
+    })
+}
+
+exports.getMyCurrentInstituteData = async(req,res)=>{
+    const {instituteNumber} = req
+    const data = await sequelize.query(`SELECT * FROM institute_${instituteNumber}`,{
+        type : QueryTypes.SELECT,
+    })
+    res.status(200).json({
+        message : "Data fetched",
+        data 
+    })
+}
+
+exports.changeInstitute = async(req,res)=>{
+    const {instituteNumber,userId} = req 
+    const {instituteNumber:comingInstituteNumber} = req.body
+    if(!comingInstituteNumber){
+        return res.status(400).json({
+            message : "Please provide instituteNumber"
+        })
+    }
+
+    const user = await db.users.findByPk(userId)
+    user.currentInstituteNumber = comingInstituteNumber 
+    await user.save()
+    res.status(200).json({
+        message : "Changed successfully"
+    })
+ 
+}
+
+
+exports.deleteOrganization = async(req,res)=>{
+    const {instituteNumber} = req 
+    let user = await db.users.findByPk(req.userId)
+    user.currentInstituteNumber  = null 
+    await user.save()
+
+    await sequelize.query(`DELETE FROM userInstitute_${instituteNumber} WHERE instituteNumber=${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE institute_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE teachers_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE course_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE students_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+    await sequelize.query(`DROP TABLE courseSyllabus_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE courseSyllabusVideo_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE courseSyllabusReview_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE courseSyllabusQuestionsAnswer_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE courseSyllabusQna_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    await sequelize.query(`DROP TABLE courseCategory_${instituteNumber}`,{
+        type : QueryTypes.SELECT
+    })
+
+    res.status(200).json({
+        message : "Institute Deleted successfully"
+    })
+}
